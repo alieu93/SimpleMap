@@ -1,11 +1,16 @@
 package adamlieu.simplemap;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -17,10 +22,13 @@ public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
+    //TODO: Clean up code in onCreate
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LocationManager locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
-        Context context = getApplicationContext();
+        Context context = getApplicationContext(); //For Toast
+        Criteria criteria = new Criteria(); // Criteria object to get provider
+        Location location;
 
         String gpsProvider = LocationManager.GPS_PROVIDER;
 
@@ -34,10 +42,35 @@ public class MapsActivity extends FragmentActivity {
             startActivity(enableGPS);
         }
 
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+
+        String provider = locManager.getBestProvider(criteria, true); // Name for best provider
+
+        /*
+        if((checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
+            return;
+        }*/
+
+        //Check for permissions if they are granted
+        if((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
+            return;
+        }
+
+        location = locManager.getLastKnownLocation(provider); // Get last known location, basically current location
+
+        if(location != null){
+            //Get current long and lat positions
+            LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
+            //Add a marker on the map with the current position
+            mMap.addMarker(new MarkerOptions().position(currentPos));
+        }
+
+        mMap.setMyLocationEnabled(true);
+
     }
 
     @Override
