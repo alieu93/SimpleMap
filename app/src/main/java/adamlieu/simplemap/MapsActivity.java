@@ -1,7 +1,12 @@
 package adamlieu.simplemap;
 
+import android.content.Context;
+import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -14,6 +19,22 @@ public class MapsActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocationManager locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        Context context = getApplicationContext();
+
+        String gpsProvider = LocationManager.GPS_PROVIDER;
+
+        //Prompts user to enable location services if it is not already enabled
+        if(!locManager.isProviderEnabled(gpsProvider)){
+            Toast toast =  Toast.makeText(context, "Location GPS must be enabled!", Toast.LENGTH_LONG);
+            toast.show();
+
+            String locConfig = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+            Intent enableGPS = new Intent(locConfig);
+            startActivity(enableGPS);
+        }
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
