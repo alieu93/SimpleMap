@@ -22,14 +22,18 @@ public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
+    LocationManager locManager;// = (LocationManager)getSystemService(LOCATION_SERVICE);
+    Location location;
+    String provider;
+    Criteria criteria = new Criteria(); // Criteria object to get provider
+
+
+
     //TODO: Clean up code in onCreate
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        LocationManager locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
         Context context = getApplicationContext(); //For Toast
-        Criteria criteria = new Criteria(); // Criteria object to get provider
-        Location location;
-
+        locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
         String gpsProvider = LocationManager.GPS_PROVIDER;
 
         //Prompts user to enable location services if it is not already enabled
@@ -46,28 +50,7 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
-        String provider = locManager.getBestProvider(criteria, true); // Name for best provider
 
-        /*
-        if((checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
-                (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
-            return;
-        }*/
-
-        //Check for permissions if they are granted
-        if((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
-            return;
-        }
-
-        location = locManager.getLastKnownLocation(provider); // Get last known location, basically current location
-
-        if(location != null){
-            //Get current long and lat positions
-            LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
-            //Add a marker on the map with the current position
-            mMap.addMarker(new MarkerOptions().position(currentPos));
-        }
 
         mMap.setMyLocationEnabled(true);
 
@@ -114,6 +97,19 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        provider = locManager.getBestProvider(criteria, true); // Name for best provider
+        //Check for permissions if they are granted
+        if((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
+            return;
+        }
+        location = locManager.getLastKnownLocation(provider); // Get last known location, basically current location
+        if(location != null){
+            //Get current long and lat positions
+            LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
+            //Add a marker on the map with the current position
+            mMap.addMarker(new MarkerOptions().position(currentPos));
+        }
     }
 }
