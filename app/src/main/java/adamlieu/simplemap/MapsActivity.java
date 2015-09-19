@@ -13,6 +13,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -29,7 +31,6 @@ public class MapsActivity extends FragmentActivity {
 
 
 
-    //TODO: Clean up code in onCreate
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Context context = getApplicationContext(); //For Toast
@@ -50,10 +51,10 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
-
-
         mMap.setMyLocationEnabled(true);
-
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
     }
 
     @Override
@@ -109,7 +110,11 @@ public class MapsActivity extends FragmentActivity {
             //Get current long and lat positions
             LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
             //Add a marker on the map with the current position
-            mMap.addMarker(new MarkerOptions().position(currentPos));
+            mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position"));
+
+            //Controls the camera so it would zoom into current position
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentPos, 15);
+            mMap.animateCamera(cameraUpdate);
         }
     }
 }
