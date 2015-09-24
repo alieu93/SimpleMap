@@ -2,6 +2,7 @@ package adamlieu.simplemap;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -47,6 +48,7 @@ public class MapsActivity extends FragmentActivity {
             startActivity(enableGPS);
         }
 
+        //mMap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
@@ -55,6 +57,27 @@ public class MapsActivity extends FragmentActivity {
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            Context context = getApplicationContext();
+
+            @Override
+            public void onMapLongClick(LatLng point){
+                //TODO: Code for detecting when user long presses near an existing marker
+                
+                //Set marker on wherever the user long presses
+                mMap.addMarker(new MarkerOptions().position(point).title("Custom marker"));
+                //Feedback on placing marker
+                Toast toast =  Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
+                toast.show();
+            }
+
+            public void onClick(DialogInterface dialog, int which){
+
+            }
+        });
+
+
     }
 
     @Override
