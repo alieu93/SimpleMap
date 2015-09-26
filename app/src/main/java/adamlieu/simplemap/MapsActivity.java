@@ -19,11 +19,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
 
     LocationManager locManager;// = (LocationManager)getSystemService(LOCATION_SERVICE);
     Location location;
@@ -60,13 +62,21 @@ public class MapsActivity extends FragmentActivity {
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             Context context = getApplicationContext();
+            Marker marker;
 
             @Override
             public void onMapLongClick(LatLng point){
-                //TODO: Code for detecting when user long presses near an existing marker
-                
                 //Set marker on wherever the user long presses
-                mMap.addMarker(new MarkerOptions().position(point).title("Custom marker"));
+                //TODO: Edit addMarker to accept user inputted strings from the dialog box when implemented
+                mMap.addMarker(new MarkerOptions().position(point).title("Custom marker").draggable(true).visible(true).snippet("Click to remove."));
+                //Sets the snippet of the marker to remove if user presses it
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
+                    //TODO: Dialog box for user to choose between deleting, editing or not doing anything when they click on info window, some kind of option
+                    @Override
+                    public void onInfoWindowClick(Marker marker){
+                        marker.remove();
+                    }
+                });
                 //Feedback on placing marker
                 Toast toast =  Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
                 toast.show();
