@@ -1,6 +1,7 @@
 package adamlieu.simplemap;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,18 +37,29 @@ public class MapsActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Context context = getApplicationContext(); //For Toast
+        //Context context = getApplicationContext(); //For Toast
         locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
         String gpsProvider = LocationManager.GPS_PROVIDER;
 
+
+
         //Prompts user to enable location services if it is not already enabled
         if(!locManager.isProviderEnabled(gpsProvider)){
-            Toast toast =  Toast.makeText(context, "Location GPS must be enabled!", Toast.LENGTH_LONG);
-            toast.show();
+            /*Toast toast =  Toast.makeText(context, "Location GPS must be enabled!", Toast.LENGTH_LONG);
+            toast.show();*/
 
-            String locConfig = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
-            Intent enableGPS = new Intent(locConfig);
-            startActivity(enableGPS);
+            //Alert Dialog
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Notice");
+            alertDialog.setMessage("Location GPS must be enabled!");
+            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    String locConfig = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+                    Intent enableGPS = new Intent(locConfig);
+                    startActivity(enableGPS);
+                }
+            });
+            alertDialog.show();
         }
 
         //mMap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
@@ -59,6 +71,12 @@ public class MapsActivity extends FragmentActivity {
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+
+        //Map Types
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); //Default
+        //mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); //Mix
+        //mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             Context context = getApplicationContext();
