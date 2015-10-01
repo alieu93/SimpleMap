@@ -6,13 +6,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -22,6 +25,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity {
 
@@ -33,6 +39,9 @@ public class MapsActivity extends FragmentActivity {
     String provider;
     Criteria criteria = new Criteria(); // Criteria object to get provider
 
+    //Geocoder geocoder;
+    List<Address> addressList;
+
 
 
     @Override
@@ -40,8 +49,6 @@ public class MapsActivity extends FragmentActivity {
         //Context context = getApplicationContext(); //For Toast
         locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
         String gpsProvider = LocationManager.GPS_PROVIDER;
-
-
 
         //Prompts user to enable location services if it is not already enabled
         if(!locManager.isProviderEnabled(gpsProvider)){
@@ -81,17 +88,31 @@ public class MapsActivity extends FragmentActivity {
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             Context context = getApplicationContext();
             Marker marker;
+            String addressLine;
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
 
             @Override
             public void onMapLongClick(LatLng point){
+                //TODO: Clean up code
+                try {
+                    addressList = geocoder.getFromLocation(point.latitude, point.longitude, 1);
+                    addressLine = addressList.get(0).getAddressLine(0).toString();
+                    Log.w("test: ", addressList.get(0).getAddressLine(0).toString());
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
                 //Set marker on wherever the user long presses
                 //TODO: Edit addMarker to accept user inputted strings from the dialog box when implemented
-                mMap.addMarker(new MarkerOptions().position(point).title("Custom marker").draggable(true).visible(true).snippet("Click to remove."));
+                mMap.addMarker(new MarkerOptions().position(point)
+                        .title(addressLine)
+                        .draggable(true)
+                        .visible(true)
+                        .snippet("Click to remove"));
                 //Sets the snippet of the marker to remove if user presses it
-                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     //TODO: Dialog box for user to choose between deleting, editing or not doing anything when they click on info window, some kind of option
                     @Override
-                    public void onInfoWindowClick(Marker marker){
+                    public void onInfoWindowClick(Marker marker) {
                         marker.remove();
                     }
                 });
