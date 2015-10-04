@@ -15,7 +15,13 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -42,16 +48,19 @@ public class MapsActivity extends FragmentActivity {
     //Geocoder geocoder;
     List<Address> addressList;
 
-
+    //For drawer
+    private ListView mDrawerList;
+    private DrawerLayout mDrawerLayout;
+    private ArrayAdapter<String> mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Context context = getApplicationContext(); //For Toast
-        locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         String gpsProvider = LocationManager.GPS_PROVIDER;
 
         //Prompts user to enable location services if it is not already enabled
-        if(!locManager.isProviderEnabled(gpsProvider)){
+        if (!locManager.isProviderEnabled(gpsProvider)) {
             /*Toast toast =  Toast.makeText(context, "Location GPS must be enabled!", Toast.LENGTH_LONG);
             toast.show();*/
 
@@ -92,13 +101,13 @@ public class MapsActivity extends FragmentActivity {
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
 
             @Override
-            public void onMapLongClick(LatLng point){
+            public void onMapLongClick(LatLng point) {
                 //TODO: Clean up code
                 try {
                     addressList = geocoder.getFromLocation(point.latitude, point.longitude, 1);
-                    addressLine = addressList.get(0).getAddressLine(0).toString();
-                    Log.w("test: ", addressList.get(0).getAddressLine(0).toString());
-                } catch(Exception e){
+                    addressLine = addressList.get(0).getAddressLine(0);
+                    Log.w("test: ", addressList.get(0).getAddressLine(0));
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 //Set marker on wherever the user long presses
@@ -117,16 +126,38 @@ public class MapsActivity extends FragmentActivity {
                     }
                 });
                 //Feedback on placing marker
-                Toast toast =  Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
                 toast.show();
             }
 
-            public void onClick(DialogInterface dialog, int which){
+            public void onClick(DialogInterface dialog, int which) {
 
             }
         });
 
 
+        //Drawer
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.bringToFront();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        addDrawer();
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+    }
+
+    private void addDrawer(){
+        String[] testArray = { "item1", "item2", "item3" };
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, testArray);
+        mDrawerList.setAdapter(mAdapter);
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        Context context = getApplicationContext();
+        //TODO: For now, make options change the map type (satellite, normal, etc)
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+            Toast.makeText(context, "Working!", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
