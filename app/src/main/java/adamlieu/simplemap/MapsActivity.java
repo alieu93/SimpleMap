@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import static com.google.android.gms.maps.GoogleMap.*;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -89,7 +90,7 @@ public class MapsActivity extends FragmentActivity {
         mMap.getUiSettings().setMapToolbarEnabled(true);
 
         //Map Types
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); //Default
+        //mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); //Default
         //mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID); //Mix
         //mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
@@ -146,7 +147,7 @@ public class MapsActivity extends FragmentActivity {
     }
 
     private void addDrawer(){
-        String[] testArray = { "item1", "item2", "item3" };
+        String[] testArray = { "Normal", "Satellite", "Hybrid", "Terrain" };
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, testArray);
         mDrawerList.setAdapter(mAdapter);
     }
@@ -157,6 +158,22 @@ public class MapsActivity extends FragmentActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
             Toast.makeText(context, "Working!", Toast.LENGTH_LONG).show();
+
+            switch(position) {
+                case 0:
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    break;
+                case 1:
+                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                    break;
+                case 2:
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    break;
+                case 3:
+                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    break;
+            }
+
         }
     }
 
