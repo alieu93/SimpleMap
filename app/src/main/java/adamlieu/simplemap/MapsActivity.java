@@ -29,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -96,7 +97,7 @@ public class MapsActivity extends FragmentActivity {
         //mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            Context context = getApplicationContext();
+            final Context context = getApplicationContext();
             Marker marker;
             String addressLine;
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
@@ -104,6 +105,7 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void onMapLongClick(LatLng point) {
                 //TODO: Clean up code
+                final LatLng temp = point;
                 try {
                     addressList = geocoder.getFromLocation(point.latitude, point.longitude, 1);
                     addressLine = addressList.get(0).getAddressLine(0);
@@ -113,11 +115,38 @@ public class MapsActivity extends FragmentActivity {
                 }
                 //Set marker on wherever the user long presses
                 //TODO: Edit addMarker to accept user inputted strings from the dialog box when implemented
-                mMap.addMarker(new MarkerOptions().position(point)
-                        .title(addressLine)
-                        .draggable(true)
-                        .visible(true)
-                        .snippet("Click to remove"));
+
+
+                AlertDialog alert = new AlertDialog.Builder(MapsActivity.this).create();
+                alert.setMessage("Standard marker or custom marker?");
+                alert.setButton(DialogInterface.BUTTON_POSITIVE, "Standard", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        mMap.addMarker(new MarkerOptions().position(temp)
+                                .title(addressLine)
+                                .visible(true)
+                                .snippet("Click to remove"));
+
+                        //Feedback on placing marker
+                        Toast toast = Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                });
+                alert.setButton(DialogInterface.BUTTON_NEGATIVE, "Custom", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        mMap.addMarker(new MarkerOptions().position(temp)
+                                .title(addressLine)
+                                .visible(true)
+                                .snippet("Click to remove")
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.down_arrow)));
+
+                        //Feedback on placing marker
+                        Toast toast = Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                });
+                alert.show();
+
+
                 //Sets the snippet of the marker to remove if user presses it
                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     //TODO: Dialog box for user to choose between deleting, editing or not doing anything when they click on info window, some kind of option
@@ -126,14 +155,8 @@ public class MapsActivity extends FragmentActivity {
                         marker.remove();
                     }
                 });
-                //Feedback on placing marker
-                Toast toast = Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
-                toast.show();
             }
 
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
         });
 
 
