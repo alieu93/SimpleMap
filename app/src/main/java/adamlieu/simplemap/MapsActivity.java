@@ -116,7 +116,7 @@ public class MapsActivity extends FragmentActivity {
                 //Set marker on wherever the user long presses
                 //TODO: Edit addMarker to accept user inputted strings from the dialog box when implemented
 
-
+                //Choice given for the standard google maps marker or a custom marker
                 AlertDialog alert = new AlertDialog.Builder(MapsActivity.this).create();
                 alert.setMessage("Standard marker or custom marker?");
                 alert.setButton(DialogInterface.BUTTON_POSITIVE, "Standard", new DialogInterface.OnClickListener() {
