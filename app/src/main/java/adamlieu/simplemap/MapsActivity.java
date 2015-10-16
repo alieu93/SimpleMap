@@ -30,8 +30,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.GroundOverlay;
-import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -55,8 +53,6 @@ public class MapsActivity extends FragmentActivity {
     private ListView mDrawerList;
     private DrawerLayout mDrawerLayout;
     private ArrayAdapter<String> mAdapter;
-
-    LatLng UOIT = new LatLng(43.944985, -78.895273);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,48 +166,33 @@ public class MapsActivity extends FragmentActivity {
         addDrawer();
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-
-        //GroundOverlay
-        //Self note: overlay image is placed from its bottom center
-        GroundOverlayOptions uoitOver = new GroundOverlayOptions()
-                .image(BitmapDescriptorFactory.fromResource(R.drawable.uoit))
-                .position(UOIT, 237f, 300f);
-
-        GroundOverlay overlay = mMap.addGroundOverlay(uoitOver);
     }
 
     private void addDrawer(){
-        String[] testArray = { "Normal", "Satellite", "Hybrid", "Terrain", "Go to UOIT"};
+        String[] testArray = { "Normal", "Satellite", "Hybrid", "Terrain" };
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, testArray);
         mDrawerList.setAdapter(mAdapter);
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         Context context = getApplicationContext();
+        //TODO: For now, make options change the map type (satellite, normal, etc)
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+            Toast.makeText(context, "Working!", Toast.LENGTH_LONG).show();
 
             switch(position) {
                 case 0:
-                    Toast.makeText(context, "Working!", Toast.LENGTH_LONG).show();
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                     break;
                 case 1:
-                    Toast.makeText(context, "Working!", Toast.LENGTH_LONG).show();
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                     break;
                 case 2:
-                    Toast.makeText(context, "Working!", Toast.LENGTH_LONG).show();
                     mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                     break;
                 case 3:
-                    Toast.makeText(context, "Working!", Toast.LENGTH_LONG).show();
                     mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                    break;
-                case 4:
-                    Toast.makeText(context, "Heading to UOIT!", Toast.LENGTH_LONG).show();
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(UOIT, 16);
-                    mMap.animateCamera(cameraUpdate);
                     break;
             }
 
