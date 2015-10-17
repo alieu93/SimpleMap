@@ -41,6 +41,7 @@ public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
+
     LocationManager locManager;// = (LocationManager)getSystemService(LOCATION_SERVICE);
     Location location;
     String provider;
