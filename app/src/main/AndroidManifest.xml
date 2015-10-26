@@ -10,8 +10,12 @@
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but are recommended.
     -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:required="true" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -26,16 +30,33 @@
             android:value="@string/google_maps_key" />
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value="adamlieu.simplemap.MapsActivity" />
+            android:value="adamlieu.simplemap.MainActivity" />
+        <!-- android:value="adamlieu.simplemap.MapsActivity" /> -->
 
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" >
+
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MapsHeat"
+            android:label="@string/title_activity_maps_heat" >
         </activity>
     </application>
 
