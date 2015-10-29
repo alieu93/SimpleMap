@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Environment;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -30,9 +31,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -88,6 +92,8 @@ public class MapsHeat extends FragmentActivity {
             bikes = readGPS();
         } catch (JSONException e){
             Toast.makeText(this, "Error with reading JSON file", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            Log.e("JSONException", e.toString());
         }
 
         LatLng test = new LatLng(0,0);
@@ -106,21 +112,21 @@ public class MapsHeat extends FragmentActivity {
 
     private ArrayList<LatLng> readGPS() throws JSONException {
         ArrayList<LatLng> readGPS = new ArrayList<LatLng>();
-        //InputStream input = getResources().openRawResource(jsonFile);
-        //String json = new Scanner(input).next();
-        //JSONObject json = new JSONObject(jsonFile);
         String test = loadJSONFromLocal();
-        Log.i("Test", test);
         JSONObject object = new JSONObject(test);
-        //JSONArray array = object.getJSONArray("stationBeanList");
-        /*
+        JSONArray array = object.getJSONArray("stationBeanList");
+
+        Log.v("Array Length", "" + array.length());
         for(int i = 0; i < array.length(); i++){
-            JSONObject object = array.getJSONObject(i);
-            double lat = object.getDouble("latitude");
-            Log.e("Lat", "" + lat);
-            double lng = object.getDouble("longitude");
+            JSONObject temp = array.getJSONObject(i);
+            int id = temp.getInt("id");
+            String name = temp.getString("stationName");
+            int docks = temp.getInt("totalDocks");
+            double lat = temp.getDouble("latitude");
+            Log.v("Lat", "" + lat);
+            double lng = temp.getDouble("longitude");
             readGPS.add(new LatLng(lat, lng));
-        }*/
+        }
         return readGPS;
     }
 
@@ -138,6 +144,22 @@ public class MapsHeat extends FragmentActivity {
             }
             json = sb.toString();
 
+            //Only for testing
+            /*
+            String root = Environment.getExternalStorageDirectory().toString();
+            Log.i("Output", root);
+            File myDir = new File(root);
+            File file = new File(myDir, "file.txt");
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                PrintWriter pw = new PrintWriter(out);
+                pw.println(json);
+                pw.flush();
+                pw.close();
+                out.close();
+            } catch (IOException e){
+                e.printStackTrace();
+            }*/
             //InputStream input = this.getAssets().open("bikestations.json");
             /*
             int size = input.available();
@@ -146,11 +168,12 @@ public class MapsHeat extends FragmentActivity {
             input.close();
             json = new String(buffer, "UTF-8");*/
             Log.i("Log JSON", json);
+
+            return json;
         } catch (IOException ex){
             ex.printStackTrace();
             return null;
         }
-        return json;
     }
 
     /**
@@ -198,12 +221,13 @@ public class MapsHeat extends FragmentActivity {
         location = locManager.getLastKnownLocation(provider); // Get last known location, basically current location
         if(location != null){
             //Get current long and lat positions
-            LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
+            //LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
+            LatLng toronto = new LatLng(43.7000, -79.4000);
             //Add a marker on the map with the current position
-            mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position"));
+            //mMap.addMarker(new MarkerOptions().position(toronto).title("Current Position"));
 
             //Controls the camera so it would zoom into current position
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentPos, 15);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(toronto, 10);
             mMap.animateCamera(cameraUpdate);
         }
     }
