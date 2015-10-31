@@ -2,9 +2,11 @@ package adamlieu.simplemap;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -12,19 +14,31 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.Gradient;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,11 +58,39 @@ public class MapsHeat extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
+    ArrayList<LatLng> bikes = new ArrayList<LatLng>();
+
+    GroundOverlay imageOverlay;
 
     LocationManager locManager;// = (LocationManager)getSystemService(LOCATION_SERVICE);
     Location location;
     String provider;
     Criteria criteria = new Criteria(); // Criteria object to get provider
+
+    boolean heatmap = false;
+
+    //For drawer
+    private ListView mDrawerList;
+    private DrawerLayout mDrawerLayout;
+    private ArrayAdapter<String> mAdapter;
+
+    private static final int[] ALT_HEATMAP_GRADIENT_COLORS = {
+            Color.argb(0, 0, 255, 255),// transparent
+            Color.argb(255 / 3 * 2, 0, 255, 255),
+            Color.rgb(0, 191, 255),
+            Color.rgb(0, 0, 127),
+            Color.rgb(255, 0, 0)
+
+    };
+
+    public static final float[] ALT_HEATMAP_GRADIENT_START_POINTS = {
+            0.0f, 0.10f, 0.20f, 0.60f, 1.0f
+    };
+
+    public static final Gradient ALT_HEATMAP_GRADIENT = new Gradient(ALT_HEATMAP_GRADIENT_COLORS,
+            ALT_HEATMAP_GRADIENT_START_POINTS);
+    private HeatmapTileProvider mProvider;
+    private TileOverlay mOverlay;
 
 
     @Override
@@ -87,7 +129,7 @@ public class MapsHeat extends FragmentActivity {
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
 
-        ArrayList<LatLng> bikes = new ArrayList<LatLng>();
+
         try {
             bikes = readGPS();
         } catch (JSONException e){
@@ -100,11 +142,62 @@ public class MapsHeat extends FragmentActivity {
 
         for(LatLng i : bikes){
             Log.v("Lat/Lng", "" + i.latitude + " , " + i.longitude);
+            //mMap.addMarker(new MarkerOptions().position(i).visible(true));
         }
-        //Log.v("fuckingfindthis", test.toString());
+
+        //Drawer
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.bringToFront();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        addDrawer();
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        //Heatmap
+        /*
+        mProvider = new HeatmapTileProvider.Builder().data(bikes).build();
+        mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        //mProvider.setGradient(ALT_HEATMAP_GRADIENT);
+        mOverlay.clearTileCache();
+        */
+
     }
 
-    @Override
+    private void addDrawer(){
+        String[] testArray = { "Heatmap", "Overlay"};
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, testArray);
+        mDrawerList.setAdapter(mAdapter);
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        Context context = getApplicationContext();
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            switch(position){
+                case 0:
+                    if(imageOverlay != null)
+                        imageOverlay.remove();
+                    mProvider = new HeatmapTileProvider.Builder().data(bikes).build();
+                    mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+                    //mProvider.setGradient(ALT_HEATMAP_GRADIENT);
+                    mOverlay.clearTileCache();
+                    heatmap = true;
+                    break;
+                case 1:
+                    if(heatmap) {
+                        mOverlay.remove();
+                    }
+                    for(LatLng i : bikes){
+                        GroundOverlayOptions icon = new GroundOverlayOptions()
+                                .image(BitmapDescriptorFactory.fromResource(R.drawable.bike))
+                                .position(i, 100f, 100f)
+                                .transparency(0.80f);
+                        imageOverlay = mMap.addGroundOverlay(icon);
+                    }
+            }
+        }
+    }
+
+        @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
@@ -227,7 +320,7 @@ public class MapsHeat extends FragmentActivity {
             //mMap.addMarker(new MarkerOptions().position(toronto).title("Current Position"));
 
             //Controls the camera so it would zoom into current position
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(toronto, 10);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(toronto, 13);
             mMap.animateCamera(cameraUpdate);
         }
     }
