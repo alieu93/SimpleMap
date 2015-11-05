@@ -58,6 +58,18 @@
             android:name=".MapsHeat"
             android:label="@string/title_activity_maps_heat" >
         </activity>
+        <activity
+            android:name=".MarkerCluster"
+            android:label="@string/title_activity_marker_cluster" >
+        </activity>
+        <activity
+            android:name=".CanvasMap"
+            android:label="@string/title_activity_canvas_map" >
+        </activity>
+        <activity
+            android:name=".CanvasView"
+            android:label="@string/title_activity_canvas_view" >
+        </activity>
     </application>
 
 </manifest>

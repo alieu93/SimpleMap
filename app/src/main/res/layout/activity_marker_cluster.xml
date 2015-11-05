@@ -4,7 +4,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapsHeat" >
+    tools:context="adamlieu.simplemap.MarkerCluster">
 
 
     <!-- Main content view -->
@@ -26,6 +26,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent" android:id="@+id/map"
-        tools:context=".MapsHeat"
+        tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
 </android.support.v4.widget.DrawerLayout>

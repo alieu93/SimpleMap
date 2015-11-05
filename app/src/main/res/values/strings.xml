@@ -5,4 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_maps_heat">MapsHeat</string>
+    <string name="title_activity_marker_cluster">MarkerCluster</string>
+    <string name="title_activity_canvas_map">CanvasMap</string>
+    <string name="title_activity_canvas_view">CanvasView</string>
 </resources>

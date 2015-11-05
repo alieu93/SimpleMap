@@ -4,7 +4,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapsHeat" >
+    tools:context=".CanvasMap" >
 
 
     <!-- Main content view -->
@@ -26,6 +26,10 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent" android:id="@+id/map"
-        tools:context=".MapsHeat"
+        tools:context=".CanvasMap"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
+    <adamlieu.simplemap.CanvasView
+        android:id="@+id/CanvasView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 </android.support.v4.widget.DrawerLayout>

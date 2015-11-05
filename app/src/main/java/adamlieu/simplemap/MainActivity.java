@@ -46,4 +46,19 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MapsHeat.class);
         startActivity(intent);
     }
+
+    public void goToMarkerCluster(View view){
+        Intent intent = new Intent (this, MarkerCluster.class);
+        startActivity(intent);
+    }
+
+    public void goToCanvasMap(View view){
+        Intent intent = new Intent(this, CanvasMap.class);
+        startActivity(intent);
+    }
+
+    public void goToCanvasView(View view){
+        Intent intent = new Intent(this, CanvasView.class);
+        startActivity(intent);
+    }
 }
