@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -29,11 +30,13 @@ public class CanvasView extends View {
         //super.onDraw(canvas);
         //draw in black
         Paint paint = new Paint();
+        paint.setARGB(255, 0, 0, 0);
         paint.setStyle(Paint.Style.STROKE);
 
         //bottom left to top right
         int top = 100, left = 100, width = 200, height = 150;
-        canvas.drawLine(left, top + height, left + width, top, paint);
+        RectF bounds = new RectF(left, top, left+width, top+height);
+        canvas.drawRect(bounds, paint);
         invalidate();
     }
 

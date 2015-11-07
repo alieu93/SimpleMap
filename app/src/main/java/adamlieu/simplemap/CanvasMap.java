@@ -10,6 +10,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
@@ -23,6 +25,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -91,7 +94,6 @@ public class CanvasMap extends FragmentActivity {
             alertDialog.show();
         }
 
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
@@ -100,6 +102,63 @@ public class CanvasMap extends FragmentActivity {
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            final Context context = getApplicationContext();
+            Marker marker;
+            String addressLine;
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            Circle circle;
+
+            @Override
+            public void onMapLongClick(LatLng point) {
+                //TODO: Clean up code
+                final LatLng temp = point;
+                try {
+                    addressList = geocoder.getFromLocation(point.latitude, point.longitude, 1);
+                    addressLine = addressList.get(0).getAddressLine(0);
+                    Log.w("test: ", addressList.get(0).getAddressLine(0));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //Set marker on wherever the user long presses
+                mMap.addMarker(new MarkerOptions().position(temp)
+                        .title(addressLine)
+                        .visible(true)
+                        .snippet("Click to remove"));
+
+
+                CircleOptions circleOptions = new CircleOptions()
+                        //.center(new LatLng(43.945791, -78.894689))
+                        .center(temp)
+                        //.radius((21 - mMap.getCameraPosition().zoom) * 60)
+                        .radius(500)
+                        .strokeWidth(5)
+                        .strokeColor(0x7F000000)
+                        .fillColor(0x7F96B0FF);
+                //circle = mMap.addCircle(circleOptions);
+                rectToMap(point);
+
+                //Toast.makeText(context, "" + test, Toast.LENGTH_LONG).show();
+
+
+
+                //Feedback on placing marker
+                //Toast toast = Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
+                //toast.show();
+
+
+                //Sets the snippet of the marker to remove if user presses it
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    //TODO: Dialog box for user to choose between deleting, editing or not doing anything when they click on info window, some kind of option
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        marker.remove();
+                    }
+                });
+            }
+
+        });
 
 
         //Drawer
@@ -110,8 +169,9 @@ public class CanvasMap extends FragmentActivity {
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 
-        Polyline line = mMap.addPolyline(new PolylineOptions().add(new LatLng(43.945791, -78.905847), new LatLng(43.943010, -78.889110)).width(5).color(Color.RED));
+        //Polyline line = mMap.addPolyline(new PolylineOptions().add(new LatLng(43.945791, -78.905847), new LatLng(43.943010, -78.889110)).width(5).color(Color.RED));
 
+        /*
         int color = 0x7FF0F8FF;
         CircleOptions circleOptions = new CircleOptions()
                 .center(new LatLng(43.945791, -78.894689))
@@ -119,7 +179,8 @@ public class CanvasMap extends FragmentActivity {
                 .strokeColor(0x7F000000)
                 .fillColor(0x7FFFFFFF);
 
-        Circle circle = mMap.addCircle(circleOptions);
+        Circle circle = mMap.addCircle(circleOptions);*/
+
         /*
         canvasView = (CanvasView) findViewById(R.id.CanvasView);
         Bitmap temp  = getBitmapFromView(canvasView.getBitmapFromView(R.id.CanvasView));
@@ -159,18 +220,51 @@ public class CanvasMap extends FragmentActivity {
         }
     }
 
-    public static Bitmap getBitmapFromView (CanvasView view) {
-        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        Drawable background = view.getBackground();
-        if(background != null)
-            background.draw(canvas);
-        else
-            canvas.drawColor(Color.WHITE);
+    private void circleToMap(LatLng pos){
+        //int radius = 100;
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
 
-        view.draw(canvas);
-        return bitmap;
+        int d = 1000;
+        Bitmap bitmap = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setColor(0x7F96B0FF);
+        canvas.drawCircle(d / 2, d / 2, d / 2, paint);
+
+        BitmapDescriptor desc = BitmapDescriptorFactory.fromBitmap(bitmap);
+
+        mMap.addGroundOverlay(new GroundOverlayOptions()
+                .image(desc)
+                .position(pos, width)
+        );
     }
+
+    private void rectToMap(LatLng pos){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int pointWidth = size.x;
+
+        Bitmap bitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setARGB(255, 0, 0, 0);
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setColor(0x7F96B0FF);
+        int top = 0, left = 0, width = 1000, height = 1000;
+        RectF bounds = new RectF(left, top, left+width, top+height);
+        canvas.drawRect(bounds, paint);
+
+        BitmapDescriptor desc = BitmapDescriptorFactory.fromBitmap(bitmap);
+
+        mMap.addGroundOverlay(new GroundOverlayOptions()
+                    .image(desc)
+                    .position(pos, pointWidth));
+    }
+
 
     @Override
     protected void onResume() {
@@ -180,7 +274,7 @@ public class CanvasMap extends FragmentActivity {
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     g* installed) and the map has not already been instantiated.. This will ensure that we only ever
      * call {@link #setUpMap()} once when {@link #mMap} is not null.
      * <p/>
      * If it isn't installed {@link SupportMapFragment} (and
