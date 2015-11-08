@@ -131,16 +131,15 @@ public class CanvasMap extends FragmentActivity {
                 CircleOptions circleOptions = new CircleOptions()
                         //.center(new LatLng(43.945791, -78.894689))
                         .center(temp)
-                        //.radius((21 - mMap.getCameraPosition().zoom) * 60)
+                                //.radius((21 - mMap.getCameraPosition().zoom) * 60)
                         .radius(500)
                         .strokeWidth(5)
                         .strokeColor(0x7F000000)
                         .fillColor(0x7F96B0FF);
-                //circle = mMap.addCircle(circleOptions);
-                rectToMap(point);
+                circle = mMap.addCircle(circleOptions);
+                //gridToMap(temp, 20);
 
                 //Toast.makeText(context, "" + test, Toast.LENGTH_LONG).show();
-
 
 
                 //Feedback on placing marker
@@ -261,8 +260,38 @@ public class CanvasMap extends FragmentActivity {
         BitmapDescriptor desc = BitmapDescriptorFactory.fromBitmap(bitmap);
 
         mMap.addGroundOverlay(new GroundOverlayOptions()
-                    .image(desc)
-                    .position(pos, pointWidth));
+                .image(desc)
+                .position(pos, pointWidth));
+    }
+
+    private void gridToMap(LatLng pos, int rectSize){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int pointWidth = size.x;
+
+
+        Bitmap bitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setARGB(255, 0, 0, 0);
+        paint.setStrokeWidth(25);
+        paint.setStyle(Paint.Style.STROKE);
+        int top, bottom, left, right;
+        for(int rows = 0; rows < 10; rows++){
+            for(int col = 0; col < 10; col++){
+                top = rows * rectSize;
+                bottom = top + rectSize;
+                left = col * rectSize;
+                right = left + rectSize;
+                canvas.drawRect(left, top, right, bottom, paint);
+            }
+        }
+        BitmapDescriptor desc = BitmapDescriptorFactory.fromBitmap(bitmap);
+
+        mMap.addGroundOverlay(new GroundOverlayOptions()
+                .image(desc)
+                .position(pos, pointWidth*2));
     }
 
 
@@ -318,6 +347,7 @@ public class CanvasMap extends FragmentActivity {
         if(location != null){
             //Get current long and lat positions
             //LatLng currentPos = new LatLng(location.getLatitude(), location.getLongitude());
+            LatLng UOIT = new LatLng(43.945791, -78.894689);
             LatLng currentPos = new LatLng(43.945791, -78.894689);
             //Add a marker on the map with the current position
             mMap.addMarker(new MarkerOptions().position(currentPos).title("UOIT"));
@@ -325,6 +355,7 @@ public class CanvasMap extends FragmentActivity {
             //Controls the camera so it would zoom into current position
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentPos, 15);
             mMap.animateCamera(cameraUpdate);
+            gridToMap(UOIT, 200);
         }
     }
 }
