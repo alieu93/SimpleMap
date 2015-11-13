@@ -61,4 +61,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CanvasView.class);
         startActivity(intent);
     }
+
+    public void goToWeather(View view){
+        Intent intent = new Intent(this, WeatherAnim.class);
+        startActivity(intent);
+    }
+    public void goToCanvasMapWithAnim(View view){
+        Intent intent = new Intent(this, CanvasMapWithAnim.class);
+        startActivity(intent);
+    }
 }

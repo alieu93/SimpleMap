@@ -8,4 +8,6 @@
     <string name="title_activity_marker_cluster">MarkerCluster</string>
     <string name="title_activity_canvas_map">CanvasMap</string>
     <string name="title_activity_canvas_view">CanvasView</string>
+    <string name="title_activity_weather_anim">WeatherAnim</string>
+    <string name="title_activity_canvas_map_with_anim">CanvasMapWithAnim</string>
 </resources>
