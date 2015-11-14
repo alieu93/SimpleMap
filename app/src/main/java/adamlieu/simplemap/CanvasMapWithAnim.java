@@ -19,6 +19,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -83,6 +84,8 @@ public class CanvasMapWithAnim extends FragmentActivity {
 
     GroundOverlay gridOverlay;
 
+    Circle circle;
+
     boolean gridSetup = false;
 
     Animation animation1;
@@ -124,7 +127,7 @@ public class CanvasMapWithAnim extends FragmentActivity {
             Marker marker;
             String addressLine;
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-            Circle circle;
+
 
             @Override
             public void onMapLongClick(LatLng point) {
@@ -138,25 +141,33 @@ public class CanvasMapWithAnim extends FragmentActivity {
                     e.printStackTrace();
                 }
                 //Set marker on wherever the user long presses
-                mMap.addMarker(new MarkerOptions().position(temp)
+                /*mMap.addMarker(new MarkerOptions().position(temp)
                         .title(addressLine)
                         .visible(true)
-                        .snippet("Click to remove"));
+                        .snippet("Click to remove"));*/
 
 
                 CircleOptions circleOptions = new CircleOptions()
-                        //.center(new LatLng(43.945791, -78.894689))
                         .center(temp)
-                                //.radius((21 - mMap.getCameraPosition().zoom) * 60)
                         .radius(500)
-                        .strokeWidth(1)
-                        .strokeColor(0x7F000000)
+                        .strokeWidth(0)
+                        //.strokeColor(0x7F000000)
                         .fillColor(0x7F96B0FF);
                 circle = mMap.addCircle(circleOptions);
-                //gridToMap(temp, 20);
 
-                //Toast.makeText(context, "" + test, Toast.LENGTH_LONG).show();
+                final double originalRad = circle.getRadius();
 
+                CountDownTimer counter = new CountDownTimer(1000, 250){
+                    public void onTick(long millisUntilFinished){
+                        circle.setRadius(circle.getRadius() + 50);
+                    }
+
+                    public void onFinish(){
+                        circle.setRadius(originalRad);
+                        start();
+                    }
+                };
+                counter.start();
 
                 //Feedback on placing marker
                 //Toast toast = Toast.makeText(context, "Marker Placed!", Toast.LENGTH_LONG);
@@ -196,6 +207,8 @@ public class CanvasMapWithAnim extends FragmentActivity {
 
         Circle circle = mMap.addCircle(circleOptions);*/
 
+
+
         /*
         canvasView = (CanvasView) findViewById(R.id.CanvasView);
         Bitmap temp  = getBitmapFromView(canvasView.getBitmapFromView(R.id.CanvasView));
@@ -217,7 +230,7 @@ public class CanvasMapWithAnim extends FragmentActivity {
                                 randGridToMap(UOIT, 200);
                             }
                         } catch (Exception e){
-
+                            Log.e("Exception", e.toString());
                         }
                     }
                 });
@@ -394,6 +407,17 @@ public class CanvasMapWithAnim extends FragmentActivity {
         GroundOverlayOptions grid = new GroundOverlayOptions().image(desc).position(pos, pointWidth * 2);
 
         gridOverlay = mMap.addGroundOverlay(grid);
+
+    }
+
+    private void pulseCircle(LatLng pos, int rad){
+        CircleOptions circleOptions = new CircleOptions()
+                //.center(new LatLng(43.945791, -78.894689))
+                .center(pos)
+                //.radius((21 - mMap.getCameraPosition().zoom) * 60)
+                .radius(rad)
+                .fillColor(0x7F96B0FF);
+        circle = mMap.addCircle(circleOptions);
 
     }
 
