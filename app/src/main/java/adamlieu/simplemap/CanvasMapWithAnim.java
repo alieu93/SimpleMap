@@ -122,6 +122,22 @@ public class CanvasMapWithAnim extends FragmentActivity {
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
 
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
+            final Context context = getApplicationContext();
+            @Override
+            public void onMapClick(LatLng position){
+                LatLng center = circle.getCenter();
+                double radius = circle.getRadius();
+                float[] distance = new float[1];
+                Location.distanceBetween(position.latitude, position.longitude, center.latitude, center.longitude, distance);
+                boolean clicked = distance[0] < radius;
+
+                if(clicked){
+                    Toast.makeText(context, "Circle clicked!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             final Context context = getApplicationContext();
             Marker marker;
@@ -408,19 +424,8 @@ public class CanvasMapWithAnim extends FragmentActivity {
 
         gridOverlay = mMap.addGroundOverlay(grid);
 
-    }
-
-    private void pulseCircle(LatLng pos, int rad){
-        CircleOptions circleOptions = new CircleOptions()
-                //.center(new LatLng(43.945791, -78.894689))
-                .center(pos)
-                //.radius((21 - mMap.getCameraPosition().zoom) * 60)
-                .radius(rad)
-                .fillColor(0x7F96B0FF);
-        circle = mMap.addCircle(circleOptions);
 
     }
-
 
     @Override
     protected void onResume() {
